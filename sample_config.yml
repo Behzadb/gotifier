@@ -1,0 +1,22 @@
+# An example configuration file to pull notification 
+# from an API
+infoIcon: ""
+warningIcon: ""
+errorIcon: ""
+
+conf:
+  - name: graylog
+    base_url: "127.0.0.1:9000/api"
+    endpoints:
+      - "alarm"
+      - "streams"
+    username: "notifier"
+    password: "password"
+    token: "kd34r3k4nr3k4rnk34jnr"
+    title: "alarms"
+    fields:
+      - id: "id"
+      - message: "description"
+      - timestamp: "triggered_at"
+      - priority: ""
+
