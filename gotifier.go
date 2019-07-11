@@ -1,6 +1,7 @@
 package gotifier
 
 import (
+	"flag"
 	"io/ioutil"
 	"log"
 	"time"
@@ -9,6 +10,9 @@ import (
 	"github.com/cron"
 	"github.com/yaml"
 )
+
+var configFilename = flag.String("config", "config.json", "Location of the config file.")
+var configuration conf
 
 // Conf contains api information
 type conf struct {
@@ -29,6 +33,7 @@ type conf struct {
 			Timestamp time.Time `yaml:"timestamp"`
 			Priority  string    `yaml:"priority"`
 		} `yaml:"fields"`
+		NotifDestination string `yaml:"notif_destination"`
 	}
 }
 
@@ -47,9 +52,10 @@ type notifications []struct {
 	}
 }
 
-func (c *conf) getConf() *conf {
+// getConf parse config file and returns configuration
+func (c *conf) getConf(configFilename string) (*conf, error) {
 
-	yamlFile, err := ioutil.ReadFile("conf.yml")
+	yamlFile, err := ioutil.ReadFile(configFilename)
 
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)
@@ -59,7 +65,7 @@ func (c *conf) getConf() *conf {
 		log.Fatalf("Unmarshal: %v", err)
 	}
 
-	return c
+	return c, err
 }
 
 // FetchNotif populates notification list
@@ -72,7 +78,7 @@ func InitCron(period int) {
 
 	d := cron.New()
 	d.AddFunc("@every "+string(period)+"m", func() {
-		FetchNotif()
+		//FetchNotif()
 	})
 	d.Start()
 }
@@ -83,4 +89,17 @@ func InvokeNotif(title string, message string, appicon string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// SendEmailNotif sends a notification to an email address
+func SendEmailNotif(title string, message string, timestamp time.Time) {
+
+}
+
+func gotifier() {
+	if *configFilename == "" {
+		*configFilename = "conf.yml"
+	}
+	configuration.getConf(*configFilename)
+
 }
